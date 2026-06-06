@@ -1,6 +1,7 @@
 import { Calculator, RefreshCw, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  calculateBorrowForTargetLtv,
   calculateBorrowRoom,
   calculateLiquidationPrice,
   calculatePortfolio,
@@ -11,6 +12,7 @@ import type { BybitLoanSnapshot } from '../domain/bybitTypes';
 import { fetchBybitLoanSnapshot } from '../services/bybitLoanClient';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
+type SimulationMode = 'usdt' | 'ltv';
 
 const demoSnapshot: BybitLoanSnapshot = {
   market: 'Bybit Crypto Loan',
@@ -50,6 +52,7 @@ export function BybitLoanCalculator() {
   const [state, setState] = useState<LoadState>('idle');
   const [snapshot, setSnapshot] = useState<BybitLoanSnapshot>(demoSnapshot);
   const [error, setError] = useState<string | null>(null);
+  const [simulationMode, setSimulationMode] = useState<SimulationMode>('usdt');
   const [newBorrowUsd, setNewBorrowUsd] = useState('1000');
   const [targetLtv, setTargetLtv] = useState('80');
   const refreshInFlightRef = useRef(false);
@@ -64,10 +67,21 @@ export function BybitLoanCalculator() {
     [portfolio, snapshot.thresholds.liquidationLtvPercent]
   );
   const liquidationPrice = useMemo(() => calculateLiquidationPrice(snapshot), [snapshot]);
-  const simulation = useMemo(
-    () => simulateBorrow(portfolio, Number(newBorrowUsd) || 0, Number(targetLtv) || snapshot.thresholds.initialLtvPercent),
-    [newBorrowUsd, portfolio, snapshot.thresholds.initialLtvPercent, targetLtv]
+  const requestedTargetLtv = Number(targetLtv.replace(',', '.'));
+  const normalizedTargetLtv = Number.isFinite(requestedTargetLtv)
+    ? Math.min(snapshot.thresholds.liquidationLtvPercent, Math.max(0, requestedTargetLtv))
+    : snapshot.thresholds.initialLtvPercent;
+  const borrowFromTargetLtv = useMemo(
+    () => calculateBorrowForTargetLtv(portfolio, normalizedTargetLtv),
+    [portfolio, normalizedTargetLtv]
   );
+  const additionalBorrowUsd =
+    simulationMode === 'ltv' ? borrowFromTargetLtv : Number(newBorrowUsd.replace(',', '.')) || 0;
+  const simulation = useMemo(
+    () => simulateBorrow(portfolio, additionalBorrowUsd, snapshot.thresholds.initialLtvPercent),
+    [additionalBorrowUsd, portfolio, snapshot.thresholds.initialLtvPercent]
+  );
+  const targetIsBelowCurrent = simulationMode === 'ltv' && normalizedTargetLtv <= portfolio.currentLtvPercent;
   const primaryCollateral = snapshot.collaterals[0] ?? null;
   const usdtRate = snapshot.borrowRates.find((rate) => rate.coin === 'USDT');
 
@@ -150,19 +164,51 @@ export function BybitLoanCalculator() {
         </section>
 
         <section className="bybit-calc__section bybit-calc__simulator">
-          <h3>Borrow simulation</h3>
-          <label>
-            New borrow in USD
-            <input value={newBorrowUsd} inputMode="decimal" onChange={(event) => setNewBorrowUsd(event.target.value)} />
-          </label>
-          <label>
-            Target LTV
-            <input value={targetLtv} inputMode="decimal" onChange={(event) => setTargetLtv(event.target.value)} />
-          </label>
+          <div className="bybit-calc__section-label">
+            <h3>Simulator</h3>
+            <small>Project new LTV or capacity</small>
+          </div>
+          <div className="bybit-calc__sim-input">
+            <div className="bybit-calc__segmented" aria-label="Simulation mode">
+              <button
+                className={simulationMode === 'usdt' ? 'is-active' : ''}
+                type="button"
+                onClick={() => setSimulationMode('usdt')}
+              >
+                USDT
+              </button>
+              <button
+                className={simulationMode === 'ltv' ? 'is-active' : ''}
+                type="button"
+                onClick={() => setSimulationMode('ltv')}
+              >
+                LTV
+              </button>
+            </div>
+            {simulationMode === 'usdt' ? (
+              <label>
+                Simulate new borrow in USDT
+                <input value={newBorrowUsd} inputMode="decimal" onChange={(event) => setNewBorrowUsd(event.target.value)} />
+              </label>
+            ) : (
+              <label>
+                Calculate borrow up to LTV
+                <input value={targetLtv} inputMode="decimal" onChange={(event) => setTargetLtv(event.target.value)} />
+              </label>
+            )}
+          </div>
           <div className="bybit-calc__sim-result">
-            <span>Simulated LTV</span>
-            <strong>{formatPercent(simulation.simulatedLtvPercent)}</strong>
-            <small>{simulation.exceedsTarget ? 'Above target' : `${formatUsd(simulation.remainingBeforeTargetUsd)} remaining before target`}</small>
+            <span>{simulationMode === 'ltv' ? 'USDT available' : 'New LTV'}</span>
+            <strong>{simulationMode === 'ltv' ? `${formatUsd(borrowFromTargetLtv)} USDT` : formatPercent(simulation.simulatedLtvPercent)}</strong>
+            <small>
+              {simulationMode === 'ltv'
+                ? targetIsBelowCurrent
+                  ? `Current LTV is already ${formatPercent(portfolio.currentLtvPercent)}`
+                  : `New LTV: ${formatPercent(simulation.simulatedLtvPercent)}`
+                : simulation.exceedsTarget
+                  ? `${formatUsd(Math.abs(simulation.remainingBeforeTargetUsd))} above ${formatPercent(snapshot.thresholds.initialLtvPercent, 0)}`
+                  : `${formatUsd(simulation.remainingBeforeTargetUsd)} left to ${formatPercent(snapshot.thresholds.initialLtvPercent, 0)}`}
+            </small>
           </div>
         </section>
 

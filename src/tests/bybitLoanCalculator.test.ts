@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import {
+  calculateBorrowForTargetLtv,
   calculateBorrowRoom,
   calculateLiquidationPrice,
   calculatePortfolio,
@@ -112,6 +113,7 @@ describe('Bybit loan calculator', () => {
     expect(portfolio.debtUsd).toBeCloseTo(11932.143481686555, 8);
     expect(calculateBorrowRoom(portfolio, 80)).toBeCloseTo(2285.847008, 5);
     expect(calculateBorrowRoom(portfolio, 95)).toBeCloseTo(4951.720225, 5);
+    expect(calculateBorrowForTargetLtv(portfolio, 70)).toBeCloseTo(508.598197, 5);
     expect(calculateLiquidationPrice(snapshot)).toBeCloseTo(42491.24, 2);
     expect(simulateBorrow(portfolio, 1000, 80)).toEqual(
       expect.objectContaining({

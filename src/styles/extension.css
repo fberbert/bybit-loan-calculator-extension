@@ -241,15 +241,54 @@
   grid-column: 2;
 }
 
-.bybit-calc__simulator {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  align-items: end;
+.bybit-calc__section-label h3,
+.bybit-calc__section-label small {
+  margin: 0;
 }
 
-.bybit-calc__simulator h3 {
-  grid-column: 1 / -1;
+.bybit-calc__section-label small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.bybit-calc__simulator {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr) minmax(200px, 0.46fr);
+  gap: 16px;
+  align-items: center;
+}
+
+.bybit-calc__sim-input {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.bybit-calc__segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #0e1219;
+  padding: 4px;
+}
+
+.bybit-calc__segmented button {
+  appearance: none;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 760;
+}
+
+.bybit-calc__segmented button.is-active {
+  background: #16b9c8;
+  color: #041014;
 }
 
 .bybit-calc__simulator label {
@@ -277,10 +316,11 @@
 
 .bybit-calc__sim-result {
   min-width: 0;
-  border: 1px solid color-mix(in srgb, var(--gold), transparent 45%);
+  min-height: 100%;
+  border: 1px solid var(--line);
   border-radius: 8px;
-  background: color-mix(in srgb, var(--gold), var(--surface-2) 88%);
-  padding: 9px 10px;
+  background: var(--surface-2);
+  padding: 14px;
 }
 
 .bybit-calc__sim-result span,
@@ -291,9 +331,10 @@
 
 .bybit-calc__sim-result strong {
   display: block;
-  margin: 3px 0;
-  color: var(--gold);
-  font-size: 18px;
+  margin: 7px 0;
+  color: var(--text);
+  font-size: 24px;
+  line-height: 1;
 }
 
 .bybit-calc__footer {

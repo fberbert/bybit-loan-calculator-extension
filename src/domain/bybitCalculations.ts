@@ -13,6 +13,10 @@ export function calculateBorrowRoom(portfolio: BybitPortfolioSummary, targetLtvP
   return Math.max(0, portfolio.collateralUsd * (targetLtvPercent / 100) - portfolio.debtUsd);
 }
 
+export function calculateBorrowForTargetLtv(portfolio: BybitPortfolioSummary, targetLtvPercent: number): number {
+  return calculateBorrowRoom(portfolio, targetLtvPercent);
+}
+
 export function calculateLiquidationPrice(snapshot: BybitLoanSnapshot, collateralCoin = 'BTC'): number | null {
   const trackedCollateral = snapshot.collaterals.find(
     (collateral) => collateral.coin.toUpperCase() === collateralCoin.toUpperCase()
