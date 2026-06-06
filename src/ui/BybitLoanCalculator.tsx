@@ -59,9 +59,9 @@ export function BybitLoanCalculator() {
     () => calculateBorrowRoom(portfolio, snapshot.thresholds.initialLtvPercent),
     [portfolio, snapshot.thresholds.initialLtvPercent]
   );
-  const marginCallBorrowRoom = useMemo(
-    () => calculateBorrowRoom(portfolio, snapshot.thresholds.marginCallLtvPercent),
-    [portfolio, snapshot.thresholds.marginCallLtvPercent]
+  const liquidationBorrowRoom = useMemo(
+    () => calculateBorrowRoom(portfolio, snapshot.thresholds.liquidationLtvPercent),
+    [portfolio, snapshot.thresholds.liquidationLtvPercent]
   );
   const liquidationPrice = useMemo(() => calculateLiquidationPrice(snapshot), [snapshot]);
   const simulation = useMemo(
@@ -132,7 +132,7 @@ export function BybitLoanCalculator() {
           <Metric label="Collateral" value={formatUsd(portfolio.collateralUsd)} />
           <Metric label="Current LTV" value={formatPercent(portfolio.currentLtvPercent)} tone={portfolio.currentLtvPercent >= 80 ? 'warning' : 'good'} />
           <Metric label={`Room to ${formatPercent(snapshot.thresholds.initialLtvPercent, 0)} LTV`} value={formatUsd(initialBorrowRoom)} />
-          <Metric label={`Room to margin call (${formatPercent(snapshot.thresholds.marginCallLtvPercent, 0)})`} value={formatUsd(marginCallBorrowRoom)} tone="warning" />
+          <Metric label={`Room to limit (${formatPercent(snapshot.thresholds.liquidationLtvPercent, 0)})`} value={formatUsd(liquidationBorrowRoom)} tone="warning" />
           <Metric label="BTC liquidation estimate" value={liquidationPrice == null ? '-' : formatUsd(liquidationPrice)} tone="danger" />
         </div>
 

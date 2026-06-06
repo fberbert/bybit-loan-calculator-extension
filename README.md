@@ -10,7 +10,7 @@ This is an auxiliary calculation tool, not financial advice.
 - Current adjusted collateral value in USD.
 - Current LTV.
 - Borrow room up to Bybit's initial LTV.
-- Borrow room up to Bybit's margin-call LTV.
+- Borrow room up to Bybit's liquidation/limit LTV.
 - Estimated BTC price that would reach Bybit's liquidation LTV.
 - Current collateral quantity and values.
 - A borrow simulator for a new USD borrow amount and a target LTV.
@@ -82,6 +82,6 @@ Tests cover:
 
 - parsing Bybit loan API responses into a normalized snapshot;
 - debt, collateral and LTV values;
-- borrow room at initial and margin-call LTV thresholds;
+- borrow room at the initial LTV and liquidation/limit LTV thresholds;
 - BTC liquidation price estimate;
 - new-borrow simulation.
