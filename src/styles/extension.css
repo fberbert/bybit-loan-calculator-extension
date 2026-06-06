@@ -54,18 +54,24 @@
   width: 36px;
   height: 36px;
   margin-right: 8px;
-  border: 0;
+  border: 0 !important;
   border-radius: 8px;
-  background: transparent;
+  background: transparent !important;
+  box-shadow: none;
   color: rgb(176, 93, 0);
   transition:
     transform 120ms ease;
 }
 
 .bybit-calc__trigger:hover {
-  background: transparent;
+  background: transparent !important;
   color: rgb(176, 93, 0);
   transform: translateY(-1px);
+}
+
+.bybit-calc__trigger svg,
+.bybit-calc__trigger svg * {
+  stroke: rgb(176, 93, 0) !important;
 }
 
 .bybit-calc__panel {
