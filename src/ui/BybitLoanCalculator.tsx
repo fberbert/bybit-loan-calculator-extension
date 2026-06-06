@@ -129,7 +129,7 @@ export function BybitLoanCalculator() {
         title="Open Bybit loan calculator"
         aria-label="Open Bybit loan calculator"
       >
-        <Calculator size={22} />
+        <Calculator color="rgb(176, 93, 0)" size={22} />
       </button>
 
       <section className="bybit-calc__panel" aria-label="Bybit loan calculator" onWheel={(event) => event.stopPropagation()}>
