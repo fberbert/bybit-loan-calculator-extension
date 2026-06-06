@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Bybit Loan Calculator",
+  "description": "Loan, collateral, LTV, borrow room and liquidation calculator for Bybit Crypto Loan.",
+  "version": "0.1.0",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "permissions": [],
+  "host_permissions": [
+    "https://www.bybit.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://www.bybit.com/pt-BR/trade/spot/crypto-loan*"],
+      "js": ["assets/content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

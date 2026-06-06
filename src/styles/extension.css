@@ -1,0 +1,325 @@
+:host {
+  all: initial;
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  color-scheme: dark;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.bybit-calc {
+  --surface: #11151d;
+  --surface-2: #171c26;
+  --surface-3: #202837;
+  --line: #384152;
+  --text: #f4f6fb;
+  --muted: #aeb6c5;
+  --gold: #f7a600;
+  --good: #25c26e;
+  --warning: #f2b84b;
+  --danger: #f25f5c;
+  position: relative;
+  z-index: 2147483647;
+  display: inline-flex;
+  align-items: center;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.bybit-calc__trigger,
+.bybit-calc__actions button {
+  appearance: none;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+}
+
+.bybit-calc__trigger {
+  width: 36px;
+  height: 36px;
+  margin-right: 8px;
+  border-color: color-mix(in srgb, var(--gold), transparent 45%);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--gold), #121212 82%);
+  color: var(--gold);
+  transition:
+    background 160ms ease,
+    transform 120ms ease;
+}
+
+.bybit-calc__trigger:hover {
+  background: color-mix(in srgb, var(--gold), #121212 72%);
+  transform: translateY(-1px);
+}
+
+.bybit-calc__panel {
+  position: fixed;
+  top: 68px;
+  right: 16px;
+  width: min(760px, calc(100vw - 32px));
+  max-height: calc(100vh - 82px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 24px 80px rgb(0 0 0 / 0.48);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px) scale(0.985);
+  transform-origin: top right;
+  transition:
+    opacity 160ms ease,
+    transform 180ms ease;
+}
+
+.bybit-calc.is-open .bybit-calc__panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.bybit-calc__header,
+.bybit-calc__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.bybit-calc__header {
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #0f131b;
+}
+
+.bybit-calc__header p,
+.bybit-calc__footer,
+.bybit-calc__metric span,
+.bybit-calc__row small,
+.bybit-calc__sim-result small,
+.bybit-calc__empty {
+  color: var(--muted);
+}
+
+.bybit-calc__header p,
+.bybit-calc__header h2,
+.bybit-calc__section h3 {
+  margin: 0;
+}
+
+.bybit-calc__header p {
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.bybit-calc__header h2 {
+  margin-top: 2px;
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.bybit-calc__actions {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.bybit-calc__actions button {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+}
+
+.bybit-calc__actions button:hover {
+  border-color: var(--gold);
+  background: var(--surface-3);
+}
+
+.bybit-calc__actions button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.bybit-calc__notice {
+  margin: 12px 16px 0;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+.bybit-calc__notice--error {
+  border-color: color-mix(in srgb, var(--danger), transparent 35%);
+  color: #ffd6d4;
+}
+
+.bybit-calc__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 16px;
+}
+
+.bybit-calc__metric,
+.bybit-calc__section {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+
+.bybit-calc__metric {
+  min-width: 0;
+  padding: 12px;
+}
+
+.bybit-calc__metric span {
+  display: block;
+  font-size: 12px;
+}
+
+.bybit-calc__metric strong {
+  display: block;
+  margin-top: 5px;
+  overflow-wrap: anywhere;
+  font-size: 20px;
+  line-height: 1.05;
+}
+
+.bybit-calc__metric.is-good strong {
+  color: var(--good);
+}
+
+.bybit-calc__metric.is-warning strong {
+  color: var(--warning);
+}
+
+.bybit-calc__metric.is-danger strong {
+  color: var(--danger);
+}
+
+.bybit-calc__section {
+  margin: 0 16px 14px;
+  padding: 14px;
+}
+
+.bybit-calc__section h3 {
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.bybit-calc__row {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 4px 10px;
+  align-items: baseline;
+}
+
+.bybit-calc__row strong {
+  color: var(--gold);
+}
+
+.bybit-calc__row small {
+  grid-column: 2;
+}
+
+.bybit-calc__simulator {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+.bybit-calc__simulator h3 {
+  grid-column: 1 / -1;
+}
+
+.bybit-calc__simulator label {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.bybit-calc__simulator input {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #0e1219;
+  color: var(--text);
+  font: inherit;
+  outline: none;
+  padding: 0 10px;
+}
+
+.bybit-calc__simulator input:focus {
+  border-color: var(--gold);
+}
+
+.bybit-calc__sim-result {
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--gold), transparent 45%);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--gold), var(--surface-2) 88%);
+  padding: 9px 10px;
+}
+
+.bybit-calc__sim-result span,
+.bybit-calc__sim-result small {
+  display: block;
+  font-size: 12px;
+}
+
+.bybit-calc__sim-result strong {
+  display: block;
+  margin: 3px 0;
+  color: var(--gold);
+  font-size: 18px;
+}
+
+.bybit-calc__footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+}
+
+@media (max-width: 720px) {
+  .bybit-calc__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bybit-calc__simulator {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .bybit-calc__panel {
+    left: 8px;
+    right: 8px;
+    width: auto;
+  }
+
+  .bybit-calc__metrics {
+    grid-template-columns: 1fr;
+  }
+}
