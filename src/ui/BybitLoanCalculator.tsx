@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   calculateBorrowForTargetLtv,
   calculateBorrowRoom,
+  calculateDebtInCollateral,
   calculateLiquidationPrice,
   calculatePortfolio,
   simulateBorrow
@@ -86,6 +87,7 @@ export function BybitLoanCalculator() {
   );
   const targetIsBelowCurrent = simulationMode === 'ltv' && normalizedTargetLtv <= portfolio.currentLtvPercent;
   const primaryCollateral = snapshot.collaterals[0] ?? null;
+  const debtInPrimaryCollateral = primaryCollateral ? calculateDebtInCollateral(snapshot, primaryCollateral.coin) : null;
   const usdtRate = snapshot.borrowRates.find((rate) => rate.coin === 'USDT');
 
   useEffect(() => {
@@ -150,7 +152,16 @@ export function BybitLoanCalculator() {
         {error && <p className="bybit-calc__notice bybit-calc__notice--error">{error}</p>}
 
         <div className="bybit-calc__metrics">
-          <Metric label="Debt" value={formatUsd(portfolio.debtUsd)} detail={formatBrl(portfolio.debtUsd * usdtBrl)} />
+          <Metric
+            label="Debt"
+            value={formatUsd(portfolio.debtUsd)}
+            detail={[
+              formatBrl(portfolio.debtUsd * usdtBrl),
+              primaryCollateral && debtInPrimaryCollateral != null
+                ? formatCrypto(debtInPrimaryCollateral, primaryCollateral.coin)
+                : null
+            ].filter(Boolean).join(' | ')}
+          />
           <Metric label="Collateral" value={formatUsd(portfolio.collateralUsd)} detail={formatBrl(portfolio.collateralUsd * usdtBrl)} />
           <Metric label="Current LTV" value={formatPercent(portfolio.currentLtvPercent)} tone={portfolio.currentLtvPercent >= 80 ? 'warning' : 'good'} />
           <Metric label={`Room to ${formatPercent(snapshot.thresholds.initialLtvPercent, 0)} LTV`} value={formatUsd(initialBorrowRoom)} detail={formatBrl(initialBorrowRoom * usdtBrl)} />

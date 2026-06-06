@@ -34,6 +34,19 @@ export function calculateLiquidationPrice(snapshot: BybitLoanSnapshot, collatera
   return requiredTrackedAdjustedUsd <= 0 ? 0 : requiredTrackedAdjustedUsd / trackedCollateral.quantity;
 }
 
+export function calculateDebtInCollateral(snapshot: BybitLoanSnapshot, collateralCoin = 'BTC'): number | null {
+  const trackedCollateral = snapshot.collaterals.find(
+    (collateral) => collateral.coin.toUpperCase() === collateralCoin.toUpperCase()
+  );
+
+  if (!trackedCollateral || trackedCollateral.quantity <= 0 || trackedCollateral.marketUsdValue <= 0) {
+    return null;
+  }
+
+  const collateralUsdPrice = trackedCollateral.marketUsdValue / trackedCollateral.quantity;
+  return snapshot.debtUsd / collateralUsdPrice;
+}
+
 export function simulateBorrow(
   portfolio: BybitPortfolioSummary,
   additionalBorrowUsd: number,
