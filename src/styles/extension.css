@@ -57,15 +57,14 @@
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: rgb(176 93 0);
+  color: rgb(176, 93, 0);
   transition:
-    color 160ms ease,
     transform 120ms ease;
 }
 
 .bybit-calc__trigger:hover {
   background: transparent;
-  color: rgb(202 112 8);
+  color: rgb(176, 93, 0);
   transform: translateY(-1px);
 }
 
