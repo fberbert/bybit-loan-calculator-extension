@@ -29,6 +29,7 @@
   --good: #25c26e;
   --warning: #f2b84b;
   --danger: #f25f5c;
+  --bybit-deposit-icon-rgb: 176, 93, 0;
   position: relative;
   z-index: 2147483647;
   display: inline-flex;
@@ -58,20 +59,20 @@
   border-radius: 8px;
   background: transparent !important;
   box-shadow: none;
-  color: rgb(176, 93, 0);
+  color: rgb(var(--bybit-deposit-icon-rgb));
   transition:
     transform 120ms ease;
 }
 
 .bybit-calc__trigger:hover {
   background: transparent !important;
-  color: rgb(176, 93, 0);
+  color: rgb(var(--bybit-deposit-icon-rgb));
   transform: translateY(-1px);
 }
 
 .bybit-calc__trigger svg,
 .bybit-calc__trigger svg * {
-  stroke: rgb(176, 93, 0) !important;
+  stroke: rgb(var(--bybit-deposit-icon-rgb)) !important;
 }
 
 .bybit-calc__panel {
