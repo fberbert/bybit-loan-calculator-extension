@@ -1,7 +1,7 @@
 node_modules/
 dist/
-assets/
-icons/
+/assets/
+/icons/
 .DS_Store
 *.log
 .env

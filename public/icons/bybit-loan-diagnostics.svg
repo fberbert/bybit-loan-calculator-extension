@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Bybit loan diagnostics">
+  <rect width="128" height="128" rx="20" fill="#121212"/>
+  <path fill="#f7c843" d="M30 28h23c16 0 25 8 25 20 0 7-4 13-10 16 8 3 13 10 13 19 0 14-11 21-28 21H30V28Zm18 17v14h8c7 0 10-3 10-7s-3-7-10-7h-8Zm0 31v14h10c7 0 11-3 11-7s-4-7-11-7H48Z"/>
+  <path fill="#ffffff" d="M86 31h12v73H86z"/>
+  <circle cx="96" cy="95" r="19" fill="#121212" stroke="#f7c843" stroke-width="8"/>
+  <path fill="none" stroke="#ffffff" stroke-linecap="round" stroke-width="6" d="m108 108 13 13"/>
+</svg>
