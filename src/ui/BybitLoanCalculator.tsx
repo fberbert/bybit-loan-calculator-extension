@@ -7,8 +7,9 @@ import {
   calculatePortfolio,
   simulateBorrow
 } from '../domain/bybitCalculations';
-import { formatCrypto, formatPercent, formatUsd } from '../domain/formatters';
+import { formatBrl, formatCrypto, formatPercent, formatUsd } from '../domain/formatters';
 import type { BybitLoanSnapshot } from '../domain/bybitTypes';
+import { fetchExtensionUsdtBrlPrice } from '../services/extensionPriceClient';
 import { fetchBybitLoanSnapshot } from '../services/bybitLoanClient';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
@@ -51,6 +52,8 @@ export function BybitLoanCalculator() {
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<LoadState>('idle');
   const [snapshot, setSnapshot] = useState<BybitLoanSnapshot>(demoSnapshot);
+  const [usdtBrl, setUsdtBrl] = useState(5.22);
+  const [priceSource, setPriceSource] = useState<'KuCoin' | 'demo'>('demo');
   const [error, setError] = useState<string | null>(null);
   const [simulationMode, setSimulationMode] = useState<SimulationMode>('usdt');
   const [newBorrowUsd, setNewBorrowUsd] = useState('1000');
@@ -99,8 +102,13 @@ export function BybitLoanCalculator() {
     setError(null);
 
     try {
-      const liveSnapshot = await fetchBybitLoanSnapshot();
+      const [liveSnapshot, livePrice] = await Promise.all([
+        fetchBybitLoanSnapshot(),
+        fetchExtensionUsdtBrlPrice()
+      ]);
       setSnapshot(liveSnapshot);
+      setUsdtBrl(livePrice.usdtBrl);
+      setPriceSource(livePrice.source);
       setState('ready');
     } catch (currentError) {
       setError(currentError instanceof Error ? currentError.message : 'Failed to load Bybit loan data.');
@@ -142,12 +150,12 @@ export function BybitLoanCalculator() {
         {error && <p className="bybit-calc__notice bybit-calc__notice--error">{error}</p>}
 
         <div className="bybit-calc__metrics">
-          <Metric label="Debt" value={formatUsd(portfolio.debtUsd)} />
-          <Metric label="Collateral" value={formatUsd(portfolio.collateralUsd)} />
+          <Metric label="Debt" value={formatUsd(portfolio.debtUsd)} detail={formatBrl(portfolio.debtUsd * usdtBrl)} />
+          <Metric label="Collateral" value={formatUsd(portfolio.collateralUsd)} detail={formatBrl(portfolio.collateralUsd * usdtBrl)} />
           <Metric label="Current LTV" value={formatPercent(portfolio.currentLtvPercent)} tone={portfolio.currentLtvPercent >= 80 ? 'warning' : 'good'} />
-          <Metric label={`Room to ${formatPercent(snapshot.thresholds.initialLtvPercent, 0)} LTV`} value={formatUsd(initialBorrowRoom)} />
-          <Metric label={`Room to limit (${formatPercent(snapshot.thresholds.liquidationLtvPercent, 0)})`} value={formatUsd(liquidationBorrowRoom)} tone="warning" />
-          <Metric label="BTC liquidation estimate" value={liquidationPrice == null ? '-' : formatUsd(liquidationPrice)} tone="danger" />
+          <Metric label={`Room to ${formatPercent(snapshot.thresholds.initialLtvPercent, 0)} LTV`} value={formatUsd(initialBorrowRoom)} detail={formatBrl(initialBorrowRoom * usdtBrl)} />
+          <Metric label={`Room to limit (${formatPercent(snapshot.thresholds.liquidationLtvPercent, 0)})`} value={formatUsd(liquidationBorrowRoom)} detail={formatBrl(liquidationBorrowRoom * usdtBrl)} tone="warning" />
+          <Metric label="BTC liquidation estimate" value={liquidationPrice == null ? '-' : formatUsd(liquidationPrice)} detail={liquidationPrice == null ? '' : formatBrl(liquidationPrice * usdtBrl)} tone="danger" />
         </div>
 
         <section className="bybit-calc__section">
@@ -156,7 +164,7 @@ export function BybitLoanCalculator() {
             <div className="bybit-calc__row">
               <span>{primaryCollateral.coin}</span>
               <strong>{formatCrypto(primaryCollateral.quantity, primaryCollateral.coin)}</strong>
-              <small>{formatUsd(primaryCollateral.adjustedUsdValue)} adjusted, {formatUsd(primaryCollateral.marketUsdValue)} market</small>
+              <small>{formatUsd(primaryCollateral.adjustedUsdValue)} / {formatBrl(primaryCollateral.adjustedUsdValue * usdtBrl)} adjusted, {formatUsd(primaryCollateral.marketUsdValue)} market</small>
             </div>
           ) : (
             <p className="bybit-calc__empty">No collateral found.</p>
@@ -200,6 +208,7 @@ export function BybitLoanCalculator() {
           <div className="bybit-calc__sim-result">
             <span>{simulationMode === 'ltv' ? 'USDT available' : 'New LTV'}</span>
             <strong>{simulationMode === 'ltv' ? `${formatUsd(borrowFromTargetLtv)} USDT` : formatPercent(simulation.simulatedLtvPercent)}</strong>
+            {simulationMode === 'ltv' && <em>{formatBrl(borrowFromTargetLtv * usdtBrl)}</em>}
             <small>
               {simulationMode === 'ltv'
                 ? targetIsBelowCurrent
@@ -207,13 +216,13 @@ export function BybitLoanCalculator() {
                   : `New LTV: ${formatPercent(simulation.simulatedLtvPercent)}`
                 : simulation.exceedsTarget
                   ? `${formatUsd(Math.abs(simulation.remainingBeforeTargetUsd))} above ${formatPercent(snapshot.thresholds.initialLtvPercent, 0)}`
-                  : `${formatUsd(simulation.remainingBeforeTargetUsd)} left to ${formatPercent(snapshot.thresholds.initialLtvPercent, 0)}`}
+                  : `${formatUsd(simulation.remainingBeforeTargetUsd)} / ${formatBrl(simulation.remainingBeforeTargetUsd * usdtBrl)} left to ${formatPercent(snapshot.thresholds.initialLtvPercent, 0)}`}
             </small>
           </div>
         </section>
 
         <footer className="bybit-calc__footer">
-          <span>{usdtRate ? `USDT flexible APR ${formatPercent(usdtRate.aprPercent)}` : 'Bybit loan APIs'}</span>
+          <span>{usdtRate ? `USDT flexible APR ${formatPercent(usdtRate.aprPercent)}` : 'Bybit loan APIs'} · BRL: {priceSource}</span>
           <span>{new Date(snapshot.updatedAt).toLocaleString('pt-BR')}</span>
         </footer>
       </section>
@@ -224,16 +233,19 @@ export function BybitLoanCalculator() {
 function Metric({
   label,
   value,
+  detail,
   tone
 }: {
   label: string;
   value: string;
+  detail?: string;
   tone?: 'good' | 'warning' | 'danger';
 }) {
   return (
     <div className={`bybit-calc__metric ${tone ? `is-${tone}` : ''}`}>
       <span>{label}</span>
       <strong>{value}</strong>
+      {detail && <small>{detail}</small>}
     </div>
   );
 }

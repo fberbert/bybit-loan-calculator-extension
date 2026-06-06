@@ -6,6 +6,14 @@ export function formatUsd(value: number): string {
   }).format(value);
 }
 
+export function formatBrl(value: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    maximumFractionDigits: 2
+  }).format(value);
+}
+
 export function formatPercent(value: number, digits = 2): string {
   return `${new Intl.NumberFormat('en-US', {
     minimumFractionDigits: digits,

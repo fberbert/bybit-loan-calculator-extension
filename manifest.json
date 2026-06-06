@@ -11,8 +11,12 @@
   },
   "permissions": [],
   "host_permissions": [
-    "https://www.bybit.com/*"
+    "https://www.bybit.com/*",
+    "https://api.kucoin.com/*"
   ],
+  "background": {
+    "service_worker": "assets/background.js"
+  },
   "content_scripts": [
     {
       "matches": ["https://www.bybit.com/pt-BR/trade/spot/crypto-loan*"],

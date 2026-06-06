@@ -204,6 +204,13 @@
   line-height: 1.05;
 }
 
+.bybit-calc__metric small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .bybit-calc__metric.is-good strong {
   color: var(--good);
 }
@@ -324,9 +331,15 @@
 }
 
 .bybit-calc__sim-result span,
+.bybit-calc__sim-result em,
 .bybit-calc__sim-result small {
   display: block;
   font-size: 12px;
+}
+
+.bybit-calc__sim-result em {
+  color: var(--muted);
+  font-style: normal;
 }
 
 .bybit-calc__sim-result strong {
